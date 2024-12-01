@@ -64,7 +64,7 @@ export default function HomeScreen() {
           <ThemedText style={styles.datosPeso}>Menos de 18.5</ThemedText>
           <ThemedText style={styles.datosPeso}>18.5 – 24.9</ThemedText>
           <ThemedText style={styles.datosPeso}>25.0 – 29.9</ThemedText>
-          <ThemedText style={styles.datosPeso}>Más de 30.0</ThemedText>
+          <ThemedText style={styles.datosPeso}>Más de 30.0</ThemedText> 
         </ThemedView>
       </ThemedView>
     </ThemedView>
