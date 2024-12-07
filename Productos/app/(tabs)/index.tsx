@@ -1,281 +1,197 @@
+import 'react-native-gesture-handler'
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Modal, FlatList, StyleSheet, View, Text, TextInput, ScrollView, Button, Alert, TouchableHighlight } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
+import { StatusBar } from 'expo-status-bar';
+import { FlatList, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-let productos = [
-  { nombres: "Doritos", categoria: "Snacks", precioCompra: '0.40', precioVenta: '0.45', id: '001' },
-  { nombres: "Manicho", categoria: "Golosinas", precioCompra: '0.20', precioVenta: '0.25', id: '2' },
-  { nombres: "Coca-Cola", categoria: "Bebidas", precioCompra: '0.50', precioVenta: '0.60', id: '3' },
-  { nombres: "Lays", categoria: "Snacks", precioCompra: '0.45', precioVenta: '0.55', id: '4' },
-  { nombres: "Chicles", categoria: "Golosinas", precioCompra: '0.15', precioVenta: '0.20', id: '5' },
-  { nombres: "Agua Mineral", categoria: "Bebidas", precioCompra: '0.30', precioVenta: '0.40', id: '6' },
-  { nombres: "Oreo", categoria: "Galletas", precioCompra: '0.35', precioVenta: '0.50', id: '7' },
-  { nombres: "Pringles", categoria: "Snacks", precioCompra: '0.80', precioVenta: '0.90', id: '8' }
-];
 
-export default function HomeScreen() {
-  const [codigo, setCodigo] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [precioCompra, setPrecioCompra] = useState("");
-  const [precioVenta, setPrecioVenta] = useState("");
-  const [numProductos, setNumProductos] = useState(productos.length);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [idEliminar, setIdEliminar] = useState(null);
 
-  let MisProductos = (prod) => {
-    return (
-      <View style={styles.viewProducto}>
-        <View style={styles.id}>
-          <Text>{prod.producto.id}</Text>
-        </View>
-        <View style={styles.nombreProducto}>
-          <Text style={styles.textProd}>{prod.producto.nombres}</Text>
-          <Text>({prod.producto.categoria})</Text>
-        </View>
-        <View style={styles.precio}>
-          <Text style={styles.textPrecio}>USD {prod.producto.precioVenta}</Text>
-        </View>
-        <View style={styles.boton2}>
-          <View style={styles.boton1}>
-            <TouchableHighlight onPress={() => {
-              setCodigo(prod.producto.id);
-              setCategoria(prod.producto.categoria);
-              setNombre(prod.producto.nombres);
-              setPrecioCompra(prod.producto.precioCompra);
-              setPrecioVenta(prod.producto.precioVenta);
-            }}>
-              <View>
-                <Text>E</Text>
-              </View>
-            </TouchableHighlight>
-          </View>
-          <View style={styles.boton3}>
-            <TouchableHighlight onPress={() => {
-              setIdEliminar(prod.producto.id);
-              setModalVisible(true);
-            }} >
-              <View>
-                <Text>X</Text>
-              </View>
-            </TouchableHighlight>
-          </View>
-        </View>
-      </View>
-    )
-  };
+const Drawer = createDrawerNavigator();
 
-  const eliminarProducto = () => {
-    if (idEliminar !== null) {
-      productos = productos.filter((item) => item.id !== idEliminar);
-      setNumProductos(productos.length);
-      setModalVisible(false);
-    }
-  };
-
-  const limpiar = () => {
-    setCategoria("");
-    setCodigo("");
-    setNombre("");
-    setPrecioCompra("");
-    setPrecioVenta("");
-  };
+function ListaProductos() {
+  const [productos] = useState([
+    { nombre: "Agua Ardiente", categoría: "Alcohol", precioVenta: 3.45, id: 100 },
+    { nombre: "Blue Label", categoría: "Elixir", precioVenta: 10.25, id: 101 },
+    { nombre: "Coca-Cola", categoría: "Bebidas", precioVenta: 1.0, id: 102 },
+    { nombre: "Canelazo", categoría: "Alcohol", precioVenta: 2.5, id: 103 },
+    { nombre: "Salticas", categoría: "Galletas", precioVenta: 0.75, id: 104 },
+  ]);
 
   return (
-    <View style={styles.contenedor}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>¿Está seguro que quiere eliminar?</Text>
-            <View style={styles.modalButtons}>
-              <Button title="Cancelar" color="lawngreen" onPress={() => setModalVisible(false)} />
-              <Button title="Aceptar" color="red" onPress={eliminarProducto} />
-            </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Lista Productos</Text>
+      <FlatList
+        data={productos}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.productRow}>
+            <Text style={styles.productColumnID}>{item.id}</Text>
+            <Text style={styles.productColumnName}>
+              {item.nombre} ({item.categoría})
+            </Text>
+            <Text style={styles.productColumnMoney}>
+              USD {item.precioVenta.toFixed(2)}
+            </Text>
           </View>
-        </View>
-      </Modal>
+        )}
+      />
+      <StatusBar style="auto" />
+    </View>
+  );
+}
+function EjemploTabs() {
+  const [contenido, setContenido] = useState("Contenido A");
 
-      <ScrollView>
-        <View style={styles.viewTitle}>
-          <ThemedText style={styles.title}>PRODUCTOS</ThemedText>
-        </View>
-        <TextInput
-          style={styles.txt}
-          value={codigo}
-          placeholder='Codigo'
-          onChangeText={(txt) => setCodigo(txt)}
-          keyboardType='numeric'
-        />
-        <TextInput
-          style={styles.txt}
-          value={nombre}
-          placeholder='Nombre'
-          onChangeText={(txt) => setNombre(txt)}
-        />
-        <TextInput
-          style={styles.txt}
-          value={categoria}
-          placeholder='Categoría'
-          onChangeText={(txt) => setCategoria(txt)}
-        />
-        <TextInput
-          style={styles.txt}
-          value={precioCompra}
-          placeholder='Precio de Compra'
-          keyboardType='numeric'
-          onChangeText={(txt) => setPrecioCompra(txt)}
-        />
-        <TextInput
-          style={styles.txt}
-          value={precioVenta}
-          placeholder='Precio de Venta'
-          onChangeText={(txt) => setPrecioVenta(txt)}
-          editable={false}
-        />
-        <View style={styles.boton}>
-          <Button title='Nuevo' color='purple' onPress={limpiar} />
-        </View>
-      </ScrollView>
-
-      <View style={styles.viewProductos}>
-        <Text>Productos: {numProductos}</Text>
-        <FlatList
-          data={productos}
-          renderItem={(producto) => {
-            return <MisProductos producto={producto.item} />;
-          }}
-          keyExtractor={(item) => item.id}
-        />
+  return (
+    <View style={styles.containerEjemploTabs}>
+      <Text style={styles.contenido}>{contenido}</Text>
+      <View style={styles.botones}>
+        <TouchableOpacity
+          style={styles.boton}
+          onPress={() => setContenido("Contenido A")}
+        >
+          <Ionicons name="bonfire" size={24} color="black" />
+          <Text style={styles.textoBoton}>Configuración</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.boton}
+          onPress={() => setContenido("Contenido B")}
+        >
+          <Ionicons name="beer-outline" size={24} color="black" />
+          <Text style={styles.textoBoton}>Acerca de</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
+export default function App() {
+  return (
+    <Drawer.Navigator
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor: 'darkviolet',
+          width: 240,
+          borderColor: 'indigo',
+          borderWidth: 4
+        },
+        headerStyle: {
+          backgroundColor: 'indigo',
+        },
+        headerTintColor: 'white',
+        headerTitleAlign: 'center',
+        drawerActiveTintColor: 'black',
+        drawerActiveBackgroundColor: 'greenyellow',
+        drawerLabelStyle: { fontSize: 16 },
+      }}
+    >
+      <Drawer.Screen
+        name="Productos"
+        component={ListaProductos}
+        options={{ title: "Lista de Productos" }}
+      />
+      <Drawer.Screen
+        name="Ejemplo Tabs"
+        component={EjemploTabs}
+        options={{ title: "Ejemplo Tabs" }}
+      />
+      <Drawer.Screen
+        name="Finalizar Sesión"
+        component={ListaProductos}
+        options={{ title: "Finalizar Sesión" }}
+      />
+    </Drawer.Navigator>
+  );
+}
+
 const styles = StyleSheet.create({
-  contenedor: {
+  container: {
     flex: 1,
-    backgroundColor: 'plum',
-    padding: 5,
+    padding: 20,
+    backgroundColor: "#fff",
   },
   title: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: '700',
-    textAlign: 'center',
-    padding: 10,
-  },
-  productos: {
-    flex: 4,
-    marginTop: 30,
-    justifyContent: 'space-around',
-    borderBottomWidth: 5,
-    borderColor: 'white'
-  },
-  textProd: {
-    fontSize: 30,
-    color: 'white',
-    marginVertical: 5,
-    paddingVertical: 5
-  },
-  textPrecio: {
-    color: 'white'
-  },
-  viewTitle: {
-    flex: 1.65,
-    marginTop: 30,
-    justifyContent: 'center',
-    borderBottomWidth: 5,
-    borderColor: 'white'
-  },
-  viewProductos: {
-    flex: 6,
-    borderTopWidth: 5,
-    borderTopColor: 'white'
-  },
-  viewProducto: {
-    flex: 1,
-    backgroundColor: 'thistle',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    margin: 5,
-    padding: 15,
-    borderRadius: 30,
-    borderWidth: 10,
-    borderColor: 'purple'
-  },
-  autor: {
-    flex: 0.5,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingRight: 10,
-    borderTopWidth: 5,
-    borderColor: 'white'
-  },
-  txt: {
-    borderRadius: 10,
-    borderWidth: 5,
-    borderColor: 'purple',
-    padding: 5,
-    margin: 5
-  },
-  boton: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    margin: 5,
-  },
-  boton2: {
-    flex: 1,
-  },
-  nombreProducto: {
-    flex: 4,
-    paddingLeft: 20
-  },
-  id: {
-    flex: 0.6
-  },
-  precio: {
-    flex: 1.5,
-  },
-  boton1: {
-    margin: 5,
-    alignItems: 'center',
-    backgroundColor: '#7fff00',
-    padding: 10
-  },
-  boton3: {
-    margin: 5,
-    alignItems: 'center',
-    backgroundColor: '#dc143c',
-    padding: 10
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#4b0082',
-    opacity: 0.8
-  },
-  modalContent: {
-    width: 'auto',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 18,
+    fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 20,
+    textAlign: 'center',
   },
-  modalButtons: {
+  productRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: "blueviolet",
+    borderRadius: 8,
+    borderColor: 'indigo',
+    borderWidth: 4
+  },
+  productColumnID: {
+    flex: 0.9,
+    backgroundColor: 'chartreuse',
+    margin: 5,
+    borderRadius: 5,
+    borderColor: 'forestgreen',
+    borderWidth: 2,
+    padding: 5,
+    textAlign: 'center'
+  },
+  productColumnName: {
+    flex: 5,
+    backgroundColor: 'chartreuse',
+    margin: 5,
+    borderRadius: 5,
+    borderColor: 'forestgreen',
+    borderWidth: 2,
+    padding: 5,
+    textAlign: 'center'
+  },
+  productColumnMoney: {
+    flex: 1.3,
+    backgroundColor: 'chartreuse',
+    margin: 5,
+    borderRadius: 5,
+    borderColor: 'forestgreen',
+    borderWidth: 2,
+    padding: 5,
+    textAlign: 'center'
+  },
+  containerEjemploTabs: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: 'white'
+  },
+  contenido: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  botones: {
+    position: 'absolute',
+    bottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    paddingHorizontal: 20,
   },
-});
+  boton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: "lawngreen",
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  textoBoton: {
+    fontSize: 16,
+    marginLeft: 8,
+    color: "#333",
+  }
+})
